@@ -1,6 +1,8 @@
 # CLAUDE.md
 
 This file provides guidance to Claude Code (claude.ai/code) when working with code in this repository.
+It explains how to *modify* this code. For guidance on how to *use* the library, see
+`pair_match/USAGE.md`, also available at runtime via `pair_match.usage()`.
 
 ## What this is
 
@@ -68,7 +70,7 @@ Four modules, layered bottom-up:
 - `match_result.py`: `MatchResult`, a frozen record of `treated_index`/`control_index`
   label pairs, and the hand-off from any external matching step.
   `PairedOutcomeTable.from_match_result` accepts any `Pairing`, a `Protocol` requiring
-  only those two attributes.
+  only those two attributes (not exported in `__all__`).
 - `visualizations.py`: private plotting helpers (`_resolve_gamma_max`,
   `_sweep_sensitivity_bands`, `_plot_sensitivity_curve`). They take **callables**
   (band functions, capacity), not tables, so they have no dependency on the inference
@@ -105,12 +107,31 @@ return it. `usage()` reads `USAGE.md`, which ships as package data.
   and `USAGE.md` along with it.
 - `test/test_net_effects.py` uses the running example from the paper
   (`s00, s01, s10, s11 = 800, 30, 70, 100`; Wilson, 2026, sections 3-6) as ground
-  truth, and it imports several private helpers directly (`_p_greater`,
-  `_combined_tail_max`, `_normal_worst_case_interval`, `_resolve_method`).
+  truth. Both inference test files import private helpers directly (`_p_greater`,
+  `_combined_tail_max`, `_normal_worst_case_interval`, `_resolve_method`,
+  `_PVALUE_EPS`, `_validate_alpha`), so renaming one breaks the tests too.
 - Tests use `unittest.TestCase` classes, which pytest runs.
 
 ## Documentation
 
-`README.md` is the short overview. `pair_match/USAGE.md` is the full user guide
+`README.md` is the short overview and also the PyPI project description, so edits to it
+reach PyPI only with the next release. `pair_match/USAGE.md` is the full user guide
 (`pair_match.usage()`). NumPy-style docstrings are the authoritative reference for
 parameters and edge cases, so keep them current when behavior changes.
+
+## Publishing to PyPI
+
+Pushing a tag matching `v*` triggers `.github/workflows/publish.yml`, which builds with
+`uv build` and publishes to PyPI via trusted publishing (no API token; the job runs in
+the `pypi` environment with `id-token: write`). To release:
+
+```bash
+# Bump `version` in pyproject.toml, commit, push, and wait for CI to pass; then:
+git tag v0.2.0
+git push origin v0.2.0
+```
+
+Nothing checks that the tag matches `version` in `pyproject.toml`, and PyPI never
+accepts a version twice, so bump the version before tagging. The publish workflow does
+not wait for CI, so tag only a commit that has already passed. Tags are lightweight,
+as in Cvxium.
