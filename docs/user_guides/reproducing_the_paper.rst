@@ -344,28 +344,21 @@ probabilities. The two procedures share the point estimate but not the
 width: the paper attributes a factor of about 2.1 to the null acting on
 potential outcomes, to dropping monotonicity, and to the Bonferroni
 combination. The Wald interval the paper quotes has half-width
-:math:`z_{0.95}\sqrt{S_{01} + S_{10} - (S_{10} - S_{01})^2/S}\,/\,S`:
+:math:`z_{0.95}\sqrt{S_{01} + S_{10} - (S_{10} - S_{01})^2/S}\,/\,S`,
+which is what :func:`~pair_match.net_effects.mcnemar_ate_interval`
+computes:
 
 .. doctest::
 
     >>> z = norm.ppf(0.95)
     >>> print(f"{z * math.sqrt(30 + 70 - 40**2 / 1000) / 1000:.4f}")
     0.0163
-    >>> print(f"{0.0339 / 0.0163:.1f}")
-    2.1
-
-PairMatch's baseline,
-:func:`~pair_match.net_effects.mcnemar_ate_interval`, uses the variance
-under the null of no effect, :math:`S_{01} + S_{10}`, rather than the
-Wald variance, so its half-width is slightly wider than the paper's
-:math:`0.0163`:
-
-.. doctest::
-
     >>> from pair_match import mcnemar_ate_interval
     >>> lo, hi = mcnemar_ate_interval(table, confidence=0.90)
     >>> print(f"{(hi - lo) / 2:.4f}")
-    0.0164
+    0.0163
+    >>> print(f"{0.0339 / 0.0163:.1f}")
+    2.1
 
 Sensitivity Analysis
 --------------------

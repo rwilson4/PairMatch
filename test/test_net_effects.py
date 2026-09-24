@@ -973,8 +973,32 @@ class McNemarComparisonTest(unittest.TestCase):
     def test_center_and_width(self) -> None:
         lo, hi = mcnemar_ate_interval(_paper_table(), confidence=0.95)
         self.assertAlmostEqual((lo + hi) / 2.0, 0.040)
-        # Half-width = 1.96 * sqrt(100) / 1000 = 0.0196.
-        self.assertAlmostEqual((hi - lo) / 2.0, 0.0196, places=4)
+        # Wald: 1.96 * sqrt(30 + 70 - 40^2 / 1000) / 1000 = 1.96 * sqrt(98.4) / 1000.
+        self.assertAlmostEqual(
+            (hi - lo) / 2.0, 1.959963984540054 * math.sqrt(98.4) / 1000.0
+        )
+
+    def test_matches_paper_half_width(self) -> None:
+        # Wilson (2026), section 6: "1.645 sqrt(98.4) / 1000 ~ 0.0163".
+        lo, hi = mcnemar_ate_interval(_paper_table(), confidence=0.90)
+        self.assertAlmostEqual((hi - lo) / 2.0, 0.0163, places=4)
+
+    def test_wald_variance_shrinks_with_effect(self) -> None:
+        # The (S10 - S01)^2 / S term separates the Wald variance from the null
+        # variance S01 + S10; with every discordant pair favoring treatment it
+        # removes 300^2 / 1000 = 90 of the 300.
+        table = PairedOutcomeTable(s00=700, s01=0, s10=300, s11=0)
+        lo, hi = mcnemar_ate_interval(table, confidence=0.95)
+        self.assertAlmostEqual(
+            (hi - lo) / 2.0, 1.959963984540054 * math.sqrt(210.0) / 1000.0
+        )
+
+    def test_all_pairs_discordant_one_way_has_zero_width(self) -> None:
+        # Every pair is S10, so the plug-in variance p10 (1 - p10) is zero.
+        lo, hi = mcnemar_ate_interval(
+            PairedOutcomeTable(s00=0, s01=0, s10=50, s11=0), confidence=0.90
+        )
+        self.assertEqual((lo, hi), (1.0, 1.0))
 
     def test_narrower_than_randomization_interval(self) -> None:
         mc_lo, mc_hi = mcnemar_ate_interval(_paper_table(), confidence=0.90)

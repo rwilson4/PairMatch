@@ -136,9 +136,7 @@ change that moves a result fails `make doctest`. The paper's Figures 2-3 use
 doctests on pull requests and on pushes to master touching `docs/`, `pair_match/`,
 `pyproject.toml`, or `uv.lock`, then rsyncs `docs/_build/html/` to the droplet using the
 `DOCS_DEPLOY_KEY`, `DOCS_USER`, and `DOCS_HOST` secrets. The rsync is skipped while
-those secrets are unset. The known paper/library difference: `mcnemar_ate_interval`
-uses the null variance `S01 + S10`, not the Wald variance the paper quotes; the guide
-says so rather than hiding it.
+those secrets are unset.
 
 ## Publishing to PyPI
 

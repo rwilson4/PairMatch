@@ -1951,7 +1951,7 @@ def design_sensitivity_binary(baseline: float, ate: float) -> float:
     r"""Design sensitivity ``Γ̃`` for a matched-pair binary net effect.
 
     The Rosenbaum sensitivity value ``Γ•`` mixes two ingredients: robustness to hidden
-    bias and ordinary stochastic noise. The design sensitivity ``Γ̃`` [1]_ is the limit
+    bias and ordinary stochastic noise. The design sensitivity ``Γ̃`` [#]_ is the limit
     of ``Γ•`` as the sample size grows without bound at the favorable situation,
     isolating the bias component. If the true (unknown) hidden bias ``Γ`` exceeds
     ``Γ̃``, no amount of data will let us reject the null of zero net effect; robustness
@@ -1996,7 +1996,7 @@ def design_sensitivity_binary(baseline: float, ate: float) -> float:
     equivalently, that failures are more common than successes (``S_{11} <= S_{00}`` at
     the boundary). This is documented, not enforced; outside that regime the general
     closed form is an approximation (Wilson, 2026, section 7, "Design sensitivity")
-    [2]_.
+    [#]_.
 
     The ``baseline + ate < 1.0`` check is the *general*-regime constraint: there
     ``baseline = p_{+1}`` and ``baseline + ate = p_{1+}`` is the treated success
@@ -2010,9 +2010,9 @@ def design_sensitivity_binary(baseline: float, ate: float) -> float:
 
     References
     ----------
-    .. [1] Rosenbaum, P. R. (2004). Design sensitivity in observational
+    .. [#] Rosenbaum, P. R. (2004). Design sensitivity in observational
        studies. Biometrika, 91(1), 153-164.
-    .. [2] Wilson, B. (2026). Randomization Inference for Matched Pairs with Binary
+    .. [#] Wilson, B. (2026). Randomization Inference for Matched Pairs with Binary
        Outcomes. arXiv:2609.03227. https://arxiv.org/abs/2609.03227
 
     """
@@ -2028,17 +2028,58 @@ def design_sensitivity_binary(baseline: float, ate: float) -> float:
 def mcnemar_ate_interval(
     table: PairedOutcomeTable, *, confidence: float = 0.90
 ) -> tuple[float, float]:
-    r"""Textbook McNemar/Wald ATE interval, for comparison only.
+    r"""Textbook McNemar (Wald) ATE interval, for comparison only.
 
-    This is the conventional interval based on the discordant pairs. It is narrower than
-    ``att_confidence_set`` because it implicitly assumes monotonicity (or multinomial
-    sampling); it is provided as a baseline, not as the recommended estimator.
+    The conventional large-sample interval for the difference of marginal success
+    probabilities ``Delta = p_{1+} - p_{+1}``, which models the four counts as a
+    multinomial sample (Fleiss, Levin and Paik, 2013) [#]_:
+
+    .. math::
+
+        \hat{\Delta} \pm \frac{z_{1 - \alpha/2}}{S}
+        \sqrt{S_{01} + S_{10} - \frac{(S_{10} - S_{01})^2}{S}},
+
+    with ``\hat{\Delta} = (S_{10} - S_{01}) / S``, the same point estimate as
+    :attr:`PairedOutcomeTable.ate_hat`. It is narrower than
+    :func:`att_confidence_set` because it rests on multinomial sampling rather than
+    on randomization, and implicitly assumes monotonicity; it is provided as a
+    baseline, not as the recommended estimator (Wilson, 2026, section 6,
+    "Comparison with the textbook McNemar interval") [#]_.
+
+    Parameters
+    ----------
+     table : PairedOutcomeTable
+        The matched-pair counts.
+     confidence : float, optional
+        Two-sided coverage level. Defaults to ``0.90``.
+
+    Returns
+    -------
+     tuple of float
+        ``(lower, upper)`` on the ATE (rate) scale.
+
+    Notes
+    -----
+    The variance is the Wald (plug-in) variance of ``\hat{\Delta}``, not the variance
+    under the null ``Delta = 0``: the latter drops the ``(S_{10} - S_{01})^2 / S``
+    term, as McNemar's *test* does, and so is wider whenever the effect is nonzero.
+
+    References
+    ----------
+    .. [#] Fleiss, J. L., Levin, B., and Paik, M. C. (2013). Statistical Methods for
+       Rates and Proportions. 3rd ed. Wiley.
+    .. [#] Wilson, B. (2026). Randomization Inference for Matched Pairs with Binary
+       Outcomes. arXiv:2609.03227. https://arxiv.org/abs/2609.03227
 
     """
-    disc = table.s01 + table.s10
-    n_pairs = table.n_pairs
+    s = table.n_pairs
+    discordant = table.s01 + table.s10
+    surplus = table.s10 - table.s01
+    # Nonnegative since surplus^2 <= discordant^2 <= discordant * s; the max()
+    # only absorbs rounding.
+    variance = max(0.0, discordant - surplus * surplus / s)  # times S^2
     z = float(norm.ppf(1.0 - (1.0 - confidence) / 2.0))
-    half_width = z * math.sqrt(disc) / n_pairs
+    half_width = z * math.sqrt(variance) / s
     center = table.ate_hat
     return (center - half_width, center + half_width)
 
