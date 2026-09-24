@@ -34,7 +34,13 @@ help(PairedOutcomeTable.analyze)
 ## Installation
 
 ```bash
-uv pip install .
+pip install PairMatch
+```
+
+Or with [uv](https://docs.astral.sh/uv/):
+
+```bash
+uv add PairMatch
 ```
 
 Requires Python 3.11+ and numpy, scipy, pandas, tabulate, and

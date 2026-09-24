@@ -1,5 +1,7 @@
 # PairMatch
 
+[![CI](https://github.com/rwilson4/PairMatch/actions/workflows/ci.yml/badge.svg)](https://github.com/rwilson4/PairMatch/actions/workflows/ci.yml)
+
 Randomization inference for **matched pairs with binary outcomes**.
 
 Given pairs in which one treated unit is matched to one control and each
@@ -18,7 +20,13 @@ program and no numerical search.
 ## Install
 
 ```bash
-uv pip install .
+pip install PairMatch
+```
+
+Or with [uv](https://docs.astral.sh/uv/):
+
+```bash
+uv add PairMatch
 ```
 
 The distribution is named `PairMatch`; the import package is `pair_match`.
