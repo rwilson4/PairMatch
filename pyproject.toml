@@ -1,0 +1,196 @@
+[project]
+name = "PairMatch"
+version = "0.1.0"
+description = "Randomization inference for matched pairs with binary outcomes"
+authors = [{ name = "Bob Wilson", email = "bob.wilson@convexanalytics.com" }]
+requires-python = ">=3.11,<4"
+readme = "README.md"
+license = { file = "LICENSE.txt" }
+keywords = ["causal-inference", "matching", "randomization-inference", "sensitivity-analysis"]
+classifiers = [
+    "Programming Language :: Python :: 3",
+    "License :: OSI Approved :: Apache Software License",
+    "Topic :: Scientific/Engineering :: Mathematics",
+    "Intended Audience :: Science/Research",
+]
+dependencies = [
+    "numpy>=2.2.5,<3",
+    "scipy>=1.15.2,<2",
+    "pandas>=2.3.1,<3",
+    "tabulate>=0.9.0,<0.10",
+    # Only the plot_sensitivity methods import matplotlib, but they are part
+    # of the public API, so it is a hard dependency rather than an extra.
+    "matplotlib>=3.10.1,<4",
+]
+
+[dependency-groups]
+dev = [
+    "pytest>=9.0.3,<10",
+    "black>=26.3.1,<27",
+    "ruff>=0.11.6,<0.12",
+    "mypy>=1.14.0,<2",
+    "pandas-stubs>=2.2.0,<3",
+    "types-tabulate>=0.9.0,<0.10",
+]
+
+# The distribution is "PairMatch"; the import package is `pair_match`.
+[tool.hatch.build.targets.wheel]
+packages = ["pair_match"]
+
+[tool.hatch.build.targets.sdist]
+include = ["pair_match/", "README.md", "LICENSE.txt"]
+
+[tool.pytest.ini_options]
+testpaths = ["test"]
+
+[build-system]
+requires = ["hatchling"]
+build-backend = "hatchling.build"
+
+# Black configuration
+[tool.black]
+line-length = 88
+target-version = ['py311']
+include = '\.pyi?$'
+extend-exclude = '''
+/(
+  # directories
+  \.eggs
+  | \.git
+  | \.hg
+  | \.mypy_cache
+  | \.tox
+  | \.venv
+  | build
+  | dist
+)/
+'''
+
+# Ruff configuration
+[tool.ruff]
+line-length = 88
+target-version = "py311"
+
+exclude = [
+    ".bzr",
+    ".direnv",
+    ".eggs",
+    ".git",
+    ".git-rewrite",
+    ".hg",
+    ".mypy_cache",
+    ".nox",
+    ".pants.d",
+    ".pytype",
+    ".ruff_cache",
+    ".svn",
+    ".tox",
+    ".venv",
+    "__pypackages__",
+    "_build",
+    "buck-out",
+    "build",
+    "dist",
+    "node_modules",
+    "venv",
+]
+
+[tool.ruff.lint]
+select = [
+    "E",      # pycodestyle errors
+    "W",      # pycodestyle warnings
+    "F",      # pyflakes
+    "I",      # isort
+    "N",      # pep8-naming
+    "UP",     # pyupgrade
+    "B",      # flake8-bugbear
+    "C4",     # flake8-comprehensions
+    "SIM",    # flake8-simplify
+    "TCH",    # flake8-type-checking
+    "NPY",    # numpy-specific rules
+    "RUF",    # ruff-specific rules
+]
+
+ignore = [
+    "E501",   # Line too long (handled by black)
+    "E741",   # Ambiguous variable name (common in math: l, I, O)
+    "N803",   # Argument name should be lowercase (allows single-letter math vars)
+    "N806",   # Variable in function should be lowercase (allows math notation like M, N, X)
+    "NPY002", # Allow numpy.random.Generator for newer code
+    "SIM108", # Use ternary operator (sometimes clearer to use if-else)
+]
+
+fixable = ["ALL"]
+unfixable = []
+
+dummy-variable-rgx = "^(_+|(_+[a-zA-Z0-9_]*[a-zA-Z0-9]+?))$"
+
+[tool.ruff.lint.per-file-ignores]
+"test/**/*.py" = [
+    "B011",   # Don't require assertRaises for tests
+    "N802",   # Function name should be lowercase (test class methods can be camelCase)
+]
+
+[tool.ruff.lint.isort]
+known-first-party = ["pair_match"]
+section-order = ["future", "standard-library", "third-party", "first-party", "local-folder"]
+
+[tool.ruff.lint.pydocstyle]
+convention = "numpy"
+
+[tool.ruff.format]
+quote-style = "double"
+indent-style = "space"
+skip-magic-trailing-comma = false
+line-ending = "auto"
+docstring-code-format = true
+
+# Mypy configuration
+[tool.mypy]
+# No `python_version`: mypy then checks against the running interpreter, which
+# always matches the installed numpy stubs. numpy>=2.5 (Python>=3.12 only) ships
+# stubs using the `type` statement, which a pinned 3.11 target rejects.
+
+files = ["pair_match", "test"]
+mypy_path = "$MYPY_CONFIG_FILE_DIR"
+namespace_packages = true
+explicit_package_bases = true
+
+platform = "darwin"
+
+check_untyped_defs = true
+disallow_any_generics = true
+disallow_incomplete_defs = false
+disallow_subclassing_any = true
+disallow_untyped_calls = false
+disallow_untyped_decorators = false
+disallow_untyped_defs = false
+no_implicit_optional = true
+warn_redundant_casts = true
+warn_return_any = false
+warn_unused_configs = true
+warn_unused_ignores = true
+
+pretty = true
+show_error_codes = true
+show_error_context = true
+
+strict_equality = true
+extra_checks = true
+
+warn_unreachable = true
+warn_no_return = true
+
+[[tool.mypy.overrides]]
+module = [
+    "pandas",
+    "scipy.*",
+    "matplotlib.*",
+]
+ignore_missing_imports = true
+
+[[tool.mypy.overrides]]
+module = "test.*"
+disallow_untyped_defs = false
+disallow_incomplete_defs = false
+check_untyped_defs = false

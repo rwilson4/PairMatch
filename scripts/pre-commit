@@ -1,0 +1,14 @@
+#!/usr/bin/env bash
+set -e
+
+echo "--- black ---"
+uv run python -m black --check pair_match/ test/
+
+echo "--- ruff ---"
+uv run python -m ruff check pair_match/ test/
+
+echo "--- mypy ---"
+uv run python -m mypy
+
+echo "--- pytest ---"
+uv run python -m pytest
