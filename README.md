@@ -76,7 +76,11 @@ pairs and it takes over from there.
 
 ## Documentation
 
-`pair_match/USAGE.md` is the full guide — also available at runtime:
+The documentation site, <https://www.convexanalytics.com/PairMatch/index.html>,
+has the API reference and a guide that reproduces every calculation in
+the paper's running example with PairMatch.
+
+`pair_match/USAGE.md` is the full usage guide — also available at runtime:
 
 ```python
 import pair_match

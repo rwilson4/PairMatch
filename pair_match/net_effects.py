@@ -1951,13 +1951,13 @@ def design_sensitivity_binary(baseline: float, ate: float) -> float:
     r"""Design sensitivity ``Γ̃`` for a matched-pair binary net effect.
 
     The Rosenbaum sensitivity value ``Γ•`` mixes two ingredients: robustness to hidden
-    bias and ordinary stochastic noise. The design sensitivity ``Γ̃`` is the limit of
-    ``Γ•`` as the sample size grows without bound at the favorable situation, isolating
-    the bias component. If the true (unknown) hidden bias ``Γ`` exceeds ``Γ̃``, no amount
-    of data will let us reject the null of zero net effect; robustness is a matter of
-    effect size, not sample size. Like a power analysis, it is most useful *before* a
-    study is run: computing it post hoc from an observed table carries the same caveats
-    as post-hoc power.
+    bias and ordinary stochastic noise. The design sensitivity ``Γ̃`` [1]_ is the limit
+    of ``Γ•`` as the sample size grows without bound at the favorable situation,
+    isolating the bias component. If the true (unknown) hidden bias ``Γ`` exceeds
+    ``Γ̃``, no amount of data will let us reject the null of zero net effect; robustness
+    is a matter of effect size, not sample size. Like a power analysis, it is most
+    useful *before* a study is run: computing it post hoc from an observed table
+    carries the same caveats as post-hoc power.
 
     The closed form is ``Γ̃ = 1 + ate / baseline`` in both the general and the monotonic
     regime; only the meaning of ``baseline`` changes:
@@ -1995,8 +1995,8 @@ def design_sensitivity_binary(baseline: float, ate: float) -> float:
     (least-favorable) bias configuration sits at the top of the 2x2 contingency box --
     equivalently, that failures are more common than successes (``S_{11} <= S_{00}`` at
     the boundary). This is documented, not enforced; outside that regime the general
-    closed form is an approximation. See the "Design sensitivity" discussion in the
-    net-effects paper.
+    closed form is an approximation (Wilson, 2026, section 7, "Design sensitivity")
+    [2]_.
 
     The ``baseline + ate < 1.0`` check is the *general*-regime constraint: there
     ``baseline = p_{+1}`` and ``baseline + ate = p_{1+}`` is the treated success
@@ -2012,6 +2012,8 @@ def design_sensitivity_binary(baseline: float, ate: float) -> float:
     ----------
     .. [1] Rosenbaum, P. R. (2004). Design sensitivity in observational
        studies. Biometrika, 91(1), 153-164.
+    .. [2] Wilson, B. (2026). Randomization Inference for Matched Pairs with Binary
+       Outcomes. arXiv:2609.03227. https://arxiv.org/abs/2609.03227
 
     """
     if not 0.0 < baseline < 1.0:
