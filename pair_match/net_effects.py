@@ -1028,10 +1028,10 @@ def _two_face_root(z: float, c_fixed: int, c_sliding: int, pi: float) -> float:
     The worst-case McNemar statistic standardizes against ``Binom(n, pi)`` with ``n``
     and the statistic set by which face of the consistency box binds. With ``pi = Gamma
     / (Gamma + 1)`` this is the Gamma-sensitivity generalization of the large-sample
-    intervals (net_effects.tex, "Large-sample sensitivity intervals": the
-    standardization eqn:Z_sensitivity and the two kernels eqn:kernel_M / eqn:kernel_R,
-    tabulated in tbl:sensitivity_large_sample); at ``pi = 1/2`` it reduces to the
-    equal-selection per-face roots eqn:root_top / eqn:root_right:
+    intervals (Wilson, 2026, section 7, "Large-sample sensitivity intervals": the
+    standardization in equation 15 and the two kernels in equations 16-17, tabulated in
+    Table 5); at ``pi = 1/2`` it reduces to the equal-selection per-face roots,
+    equations 9 (top face) and 10 (right face):
 
       - "fixed" face -- the smaller count is pinned at ``c_fixed`` and the
         statistic is ``c_fixed + delta``, so ``n = 2 c_fixed + delta`` (valid
@@ -1051,6 +1051,11 @@ def _two_face_root(z: float, c_fixed: int, c_sliding: int, pi: float) -> float:
     paper's asymptotic form) ``pi = 1/2`` would reduce to ``delta* = +/- z^2 / 2 +
     sqrt(2 C z^2 + z^4 / 4)``; the correction widens the resulting set by ~``(Gamma + 1)
     / 2`` counts, tracking the exact binomial test more closely at finite samples.
+
+    References
+    ----------
+    .. [1] Wilson, B. (2026). Randomization Inference for Matched Pairs with Binary
+       Outcomes. arXiv:2609.03227. https://arxiv.org/abs/2609.03227
 
     """
     q = pi * (1.0 - pi)
@@ -1122,7 +1127,12 @@ def _largest_unrejected(
     no-information band) and ``z_of(delta) >= z``. Rejection is monotone in ``delta``,
     so the unrejected gaps form ``[1, d]``; ``d`` is found by a constant-size local
     search seeded from the closed-form ``root``. The local step settles the rare case
-    where flooring ``root`` straddles the face crossover (paper, S5).
+    where flooring ``root`` straddles the face crossover (Wilson, 2026, section 5).
+
+    References
+    ----------
+    .. [1] Wilson, B. (2026). Randomization Inference for Matched Pairs with Binary
+       Outcomes. arXiv:2609.03227. https://arxiv.org/abs/2609.03227
 
     """
 
@@ -1177,14 +1187,19 @@ def _normal_worst_case_interval(
     r"""Large-sample (Gaussian) prediction set; the O(1) analog of the bisection.
 
     Inverts the normal approximation to the worst-case McNemar test in closed form
-    (net_effects.tex, "Large-sample sensitivity intervals" and
-    tbl:sensitivity_large_sample, plus a 1/2 continuity correction) instead of by binary
-    search; at ``gamma == 1`` this is the equal-selection case (S5, tbl:large_sample).
+    (Wilson, 2026, section 7, "Large-sample sensitivity intervals" and Table 5, plus a
+    1/2 continuity correction) instead of by binary search; at ``gamma == 1`` this is
+    the equal-selection case (section 5, Table 3).
     Endpoints are ``L = hat_a - floor(delta*_lower)`` and ``U = hat_a +
     floor(delta*_upper)``, each ``delta*`` the self-consistent two-face root of
     :func:`_two_face_root`, refined to the exact integer boundary by
     :func:`_largest_unrejected`. The ``alternative`` convention matches
     :func:`_worst_case_interval`.
+
+    References
+    ----------
+    .. [1] Wilson, B. (2026). Randomization Inference for Matched Pairs with Binary
+       Outcomes. arXiv:2609.03227. https://arxiv.org/abs/2609.03227
 
     """
     pi = gamma / (gamma + 1.0)
@@ -1272,9 +1287,9 @@ def _worst_case_interval(
 
     Inverts the worst-case (over compatible sharp nulls) McNemar test on each side. The
     worst-case p-value sits at a single boundary corner of the consistency rectangle
-    (eqn:worst); under a sensitivity parameter ``gamma`` the success probability moves
-    from 1/2 to ``gamma / (gamma + 1)`` for the right-tailed test and to ``1 / (gamma +
-    1)`` for the left-tailed test.
+    (Wilson, 2026, section 4, equations 5-6); under a sensitivity parameter ``gamma``
+    the success probability moves from 1/2 to ``gamma / (gamma + 1)`` for the
+    right-tailed test and to ``1 / (gamma + 1)`` for the left-tailed test.
 
     With ``method="exact"`` the test is inverted by binary search over exact binomial
     tails. With ``method="normal"`` the closed-form Gaussian approximation of
@@ -1289,6 +1304,11 @@ def _worst_case_interval(
         the full ``alpha``, upper endpoint ``math.inf``.
       - "less": ``(-inf, upper]`` -- the (left-tail) upper bound inverted at the
         full ``alpha``, lower endpoint ``-math.inf``.
+
+    References
+    ----------
+    .. [1] Wilson, B. (2026). Randomization Inference for Matched Pairs with Binary
+       Outcomes. arXiv:2609.03227. https://arxiv.org/abs/2609.03227
 
     """
     resolved = _resolve_method(method, c0, c1, gamma)
@@ -1440,9 +1460,14 @@ def _ate_sensitivity_band(
 
     Notes
     -----
-    The earlier form ``A_hat -/+ c (gamma - 1)`` (net_effects.tex, "Hodges- Lehmann
-    point estimate under sensitivity") is the leading, moderate-``gamma`` branch of this
-    exact expression.
+    The earlier form ``A_hat -/+ c (gamma - 1)`` (Wilson, 2026, section 7,
+    "Hodges-Lehmann point estimate under sensitivity"; Table 4) is the leading,
+    moderate-``gamma`` branch of this exact expression.
+
+    References
+    ----------
+    .. [1] Wilson, B. (2026). Randomization Inference for Matched Pairs with Binary
+       Outcomes. arXiv:2609.03227. https://arxiv.org/abs/2609.03227
 
     """
     # An empty table has no defined ATE (0 / 0); match the success-rate

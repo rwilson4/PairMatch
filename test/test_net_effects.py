@@ -31,7 +31,9 @@ from pair_match.net_effects import (
     worst_case_pvalue,
 )
 
-# The running example from the paper (net_effects.tex, Sections 3-6).
+# The running example from the paper (Wilson, 2026, sections 3-6): "Randomization
+# Inference for Matched Pairs with Binary Outcomes," arXiv:2609.03227,
+# https://arxiv.org/abs/2609.03227.
 S00, S01, S10, S11 = 800, 30, 70, 100
 
 
@@ -639,7 +641,7 @@ class DesignSensitivityBinaryTest(unittest.TestCase):
     """Tests for ``design_sensitivity_binary``."""
 
     def test_paper_running_example(self) -> None:
-        # net_effects.tex: control success rate p_{+1} = 0.13, effect +0.04,
+        # Wilson (2026), section 7: control success rate p_{+1} = 0.13, effect +0.04,
         # for a (post-hoc) general design sensitivity of 1.31.
         self.assertAlmostEqual(
             design_sensitivity_binary(baseline=0.13, ate=0.04), 1.31, places=2

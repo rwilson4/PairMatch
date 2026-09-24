@@ -448,6 +448,9 @@ restored = PairedOutcomeAnalysis.deserialize(s=payload)
 
 ## References
 
+- Wilson, Bob. 2026. "Randomization Inference for Matched Pairs with
+  Binary Outcomes." arXiv:2609.03227.
+  <https://arxiv.org/abs/2609.03227>
 - Rosenbaum, Paul R. 2002. "Attributing Effects to Treatment in Matched
   Observational Studies." *Journal of the American Statistical
   Association* 97 (457): 183–192.

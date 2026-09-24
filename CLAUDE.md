@@ -10,7 +10,10 @@ ATT/ATU/ATE, worst-case p-values, and Rosenbaum sensitivity analysis (`Γ•`). 
 inverts a worst-case McNemar test, which has a closed-form worst-case allocation, so
 intervals cost `O(log S)` binomial tail evaluations. It makes **no monotonicity
 assumption** by default (`monotonic=True` opts in) and fits no outcome model. How the
-pairs were formed is out of scope; the package takes pairs as given.
+pairs were formed is out of scope; the package takes pairs as given. The method is
+from Wilson (2026), "Randomization Inference for Matched Pairs with Binary Outcomes"
+(https://arxiv.org/abs/2609.03227); docstrings cite it by section, equation, and table
+number.
 
 The library and PyPI distribution are named `PairMatch`; the import package is
 `pair_match` (`from pair_match import PairedOutcomeTable`).
@@ -101,7 +104,7 @@ return it. `usage()` reads `USAGE.md`, which ships as package data.
   import from `pair_match`. When you add or rename a public symbol, update `__all__`
   and `USAGE.md` along with it.
 - `test/test_net_effects.py` uses the running example from the paper
-  (`s00, s01, s10, s11 = 800, 30, 70, 100`, "net_effects.tex, Sections 3-6") as ground
+  (`s00, s01, s10, s11 = 800, 30, 70, 100`; Wilson, 2026, sections 3-6) as ground
   truth, and it imports several private helpers directly (`_p_greater`,
   `_combined_tail_max`, `_normal_worst_case_interval`, `_resolve_method`).
 - Tests use `unittest.TestCase` classes, which pytest runs.
